@@ -1,0 +1,6 @@
+{
+  "name": "SpectraPulse Audio Studio",
+  "description": "Профессиональный интерактивный визуализатор музыки с поддержкой микрофона, аудиофайлов (MP3, WAV, FLAC), видеоэкспорта, облачной синхронизации пресетов и гибкой настройкой интерфейса.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,179 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Pillar 1: Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global Primitives
+    function isSignedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidMode(mode) {
+      return mode is string && mode.size() <= 32 &&
+        (mode == 'bars' || mode == 'circular' || mode == 'radial-wave' || mode == 'dual-spectrum' || mode == 'particles' || mode == 'spectrum-nebula');
+    }
+
+    function isValidColorTheme(theme) {
+      return theme is string && theme.size() <= 32 &&
+        (theme == 'obsidian-gold' || theme == 'arctic-cyan' || theme == 'crimson-pulse' || theme == 'emerald-matrix' || theme == 'ultraviolet' || theme == 'monochrome');
+    }
+
+    function isValidTrackFormat(fmt) {
+      return fmt is string && fmt.size() <= 16 &&
+        (fmt == 'MP3' || fmt == 'WAV' || fmt == 'FLAC' || fmt == 'SYNTH' || fmt == 'MIC');
+    }
+
+    // Validation Blueprint: Preset
+    function isValidPreset(data) {
+      return data.keys().hasAll([
+        'id', 'ownerId', 'name', 'mode', 'colorTheme',
+        'sensitivity', 'smoothing', 'barCount', 'mirrorMode',
+        'showPeaks', 'glowIntensity', 'rotationSpeed', 'bassBoost',
+        'createdAt', 'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'id', 'ownerId', 'name', 'mode', 'colorTheme',
+        'sensitivity', 'smoothing', 'barCount', 'mirrorMode',
+        'showPeaks', 'glowIntensity', 'rotationSpeed', 'bassBoost',
+        'createdAt', 'updatedAt'
+      ]) &&
+      isValidId(data.id) &&
+      isValidId(data.ownerId) &&
+      data.ownerId == request.auth.uid &&
+      data.name is string && data.name.size() >= 1 && data.name.size() <= 80 &&
+      isValidMode(data.mode) &&
+      isValidColorTheme(data.colorTheme) &&
+      data.sensitivity is number && data.sensitivity >= 0.2 && data.sensitivity <= 4.0 &&
+      data.smoothing is number && data.smoothing >= 0.1 && data.smoothing <= 0.95 &&
+      data.barCount is number && data.barCount >= 32 && data.barCount <= 256 &&
+      data.mirrorMode is bool &&
+      data.showPeaks is bool &&
+      data.glowIntensity is number && data.glowIntensity >= 0 && data.glowIntensity <= 100 &&
+      data.rotationSpeed is number && data.rotationSpeed >= 0 && data.rotationSpeed <= 10 &&
+      data.bassBoost is number && data.bassBoost >= 0 && data.bassBoost <= 24 &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
+    }
+
+    // Validation Blueprint: ProjectDraft
+    function isValidProjectDraft(data) {
+      return data.keys().hasAll([
+        'id', 'ownerId', 'projectName', 'trackName', 'trackFormat',
+        'mode', 'colorTheme', 'sensitivity', 'smoothing', 'barCount',
+        'mirrorMode', 'showPeaks', 'glowIntensity', 'rotationSpeed',
+        'bassBoost', 'notes', 'showLeftPanel', 'showRightPanel',
+        'showTimeline', 'showMeters', 'autoHideControls', 'darkTheme',
+        'createdAt', 'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'id', 'ownerId', 'projectName', 'trackName', 'trackFormat',
+        'mode', 'colorTheme', 'sensitivity', 'smoothing', 'barCount',
+        'mirrorMode', 'showPeaks', 'glowIntensity', 'rotationSpeed',
+        'bassBoost', 'notes', 'showLeftPanel', 'showRightPanel',
+        'showTimeline', 'showMeters', 'autoHideControls', 'darkTheme',
+        'createdAt', 'updatedAt'
+      ]) &&
+      isValidId(data.id) &&
+      isValidId(data.ownerId) &&
+      data.ownerId == request.auth.uid &&
+      data.projectName is string && data.projectName.size() >= 1 && data.projectName.size() <= 100 &&
+      data.trackName is string && data.trackName.size() >= 1 && data.trackName.size() <= 160 &&
+      isValidTrackFormat(data.trackFormat) &&
+      isValidMode(data.mode) &&
+      isValidColorTheme(data.colorTheme) &&
+      data.sensitivity is number && data.sensitivity >= 0.2 && data.sensitivity <= 4.0 &&
+      data.smoothing is number && data.smoothing >= 0.1 && data.smoothing <= 0.95 &&
+      data.barCount is number && data.barCount >= 32 && data.barCount <= 256 &&
+      data.mirrorMode is bool &&
+      data.showPeaks is bool &&
+      data.glowIntensity is number && data.glowIntensity >= 0 && data.glowIntensity <= 100 &&
+      data.rotationSpeed is number && data.rotationSpeed >= 0 && data.rotationSpeed <= 10 &&
+      data.bassBoost is number && data.bassBoost >= 0 && data.bassBoost <= 24 &&
+      data.notes is string && data.notes.size() <= 500 &&
+      data.showLeftPanel is bool &&
+      data.showRightPanel is bool &&
+      data.showTimeline is bool &&
+      data.showMeters is bool &&
+      data.autoHideControls is bool &&
+      data.darkTheme is bool &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
+    }
+
+    // Collection: /presets/{presetId}
+    match /presets/{presetId} {
+      allow get: if isSignedIn() && isValidId(presetId) && existing().ownerId == request.auth.uid;
+      allow list: if isSignedIn() && existing().ownerId == request.auth.uid;
+
+      allow create: if isSignedIn() &&
+        isValidId(presetId) &&
+        isValidPreset(incoming()) &&
+        incoming().id == presetId &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+
+      allow update: if isSignedIn() &&
+        isValidId(presetId) &&
+        isValidPreset(incoming()) &&
+        existing().ownerId == request.auth.uid &&
+        incoming().id == existing().id &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'name', 'mode', 'colorTheme', 'sensitivity', 'smoothing',
+          'barCount', 'mirrorMode', 'showPeaks', 'glowIntensity',
+          'rotationSpeed', 'bassBoost', 'updatedAt'
+        ]);
+
+      allow delete: if isSignedIn() && isValidId(presetId) && existing().ownerId == request.auth.uid;
+    }
+
+    // Collection: /drafts/{draftId}
+    match /drafts/{draftId} {
+      allow get: if isSignedIn() && isValidId(draftId) && existing().ownerId == request.auth.uid;
+      allow list: if isSignedIn() && existing().ownerId == request.auth.uid;
+
+      allow create: if isSignedIn() &&
+        isValidId(draftId) &&
+        isValidProjectDraft(incoming()) &&
+        incoming().id == draftId &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+
+      allow update: if isSignedIn() &&
+        isValidId(draftId) &&
+        isValidProjectDraft(incoming()) &&
+        existing().ownerId == request.auth.uid &&
+        incoming().id == existing().id &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'projectName', 'trackName', 'trackFormat', 'mode', 'colorTheme',
+          'sensitivity', 'smoothing', 'barCount', 'mirrorMode', 'showPeaks',
+          'glowIntensity', 'rotationSpeed', 'bassBoost', 'notes',
+          'showLeftPanel', 'showRightPanel', 'showTimeline', 'showMeters',
+          'autoHideControls', 'darkTheme', 'updatedAt'
+        ]);
+
+      allow delete: if isSignedIn() && isValidId(draftId) && existing().ownerId == request.auth.uid;
+    }
+  }
+}

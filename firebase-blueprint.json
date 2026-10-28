@@ -1,0 +1,264 @@
+{
+  "entities": {
+    "Preset": {
+      "title": "Preset",
+      "description": "User-saved audio visualizer preset configuration synced across devices",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique preset identifier",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the preset owner",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the preset",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "mode": {
+          "type": "string",
+          "description": "Visualization geometry mode",
+          "enum": ["bars", "circular", "radial-wave", "dual-spectrum", "particles", "spectrum-nebula"],
+          "maxLength": 32
+        },
+        "colorTheme": {
+          "type": "string",
+          "description": "Selected color palette identifier",
+          "enum": ["obsidian-gold", "arctic-cyan", "crimson-pulse", "emerald-matrix", "ultraviolet", "monochrome"],
+          "maxLength": 32
+        },
+        "sensitivity": {
+          "type": "number",
+          "description": "Audio gain sensitivity multiplier (0.2 to 4.0)"
+        },
+        "smoothing": {
+          "type": "number",
+          "description": "FFT temporal smoothing constant (0.1 to 0.95)"
+        },
+        "barCount": {
+          "type": "number",
+          "description": "Number of frequency bins rendered (32 to 256)"
+        },
+        "mirrorMode": {
+          "type": "boolean",
+          "description": "Whether the spectrum is mirrored symmetrically"
+        },
+        "showPeaks": {
+          "type": "boolean",
+          "description": "Whether peak hold caps are drawn"
+        },
+        "glowIntensity": {
+          "type": "number",
+          "description": "Canvas bloom intensity (0 to 100)"
+        },
+        "rotationSpeed": {
+          "type": "number",
+          "description": "Angular velocity for circular modes (0 to 10)"
+        },
+        "bassBoost": {
+          "type": "number",
+          "description": "Low-shelf EQ boost in dB (0 to 24)"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when created"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when last updated"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "name",
+        "mode",
+        "colorTheme",
+        "sensitivity",
+        "smoothing",
+        "barCount",
+        "mirrorMode",
+        "showPeaks",
+        "glowIntensity",
+        "rotationSpeed",
+        "bassBoost",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ProjectDraft": {
+      "title": "ProjectDraft",
+      "description": "Auto-saved or manually saved project draft including visualizer state and custom UI workspace layout",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique project draft identifier",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the draft owner",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "projectName": {
+          "type": "string",
+          "description": "Title of the visualizer project",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "trackName": {
+          "type": "string",
+          "description": "Name of the active audio file or source",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "trackFormat": {
+          "type": "string",
+          "description": "Audio format identifier",
+          "enum": ["MP3", "WAV", "FLAC", "SYNTH", "MIC"],
+          "maxLength": 16
+        },
+        "mode": {
+          "type": "string",
+          "description": "Visualization geometry mode",
+          "enum": ["bars", "circular", "radial-wave", "dual-spectrum", "particles", "spectrum-nebula"],
+          "maxLength": 32
+        },
+        "colorTheme": {
+          "type": "string",
+          "description": "Selected color palette identifier",
+          "enum": ["obsidian-gold", "arctic-cyan", "crimson-pulse", "emerald-matrix", "ultraviolet", "monochrome"],
+          "maxLength": 32
+        },
+        "sensitivity": {
+          "type": "number",
+          "description": "Audio gain sensitivity multiplier"
+        },
+        "smoothing": {
+          "type": "number",
+          "description": "FFT temporal smoothing constant"
+        },
+        "barCount": {
+          "type": "number",
+          "description": "Number of frequency bins rendered"
+        },
+        "mirrorMode": {
+          "type": "boolean",
+          "description": "Whether the spectrum is mirrored symmetrically"
+        },
+        "showPeaks": {
+          "type": "boolean",
+          "description": "Whether peak hold caps are drawn"
+        },
+        "glowIntensity": {
+          "type": "number",
+          "description": "Canvas bloom intensity"
+        },
+        "rotationSpeed": {
+          "type": "number",
+          "description": "Angular velocity for circular modes"
+        },
+        "bassBoost": {
+          "type": "number",
+          "description": "Low-shelf EQ boost in dB"
+        },
+        "notes": {
+          "type": "string",
+          "description": "User production notes for this project draft",
+          "maxLength": 500
+        },
+        "showLeftPanel": {
+          "type": "boolean",
+          "description": "Whether the left preset/source panel is visible"
+        },
+        "showRightPanel": {
+          "type": "boolean",
+          "description": "Whether the right inspector panel is visible"
+        },
+        "showTimeline": {
+          "type": "boolean",
+          "description": "Whether the bottom transport timeline is visible"
+        },
+        "showMeters": {
+          "type": "boolean",
+          "description": "Whether real-time dB and frequency telemetry meters are visible"
+        },
+        "autoHideControls": {
+          "type": "boolean",
+          "description": "Whether controls automatically fade out when cursor is idle"
+        },
+        "darkTheme": {
+          "type": "boolean",
+          "description": "Whether night-friendly dark mode is active"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when created"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when last updated"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "projectName",
+        "trackName",
+        "trackFormat",
+        "mode",
+        "colorTheme",
+        "sensitivity",
+        "smoothing",
+        "barCount",
+        "mirrorMode",
+        "showPeaks",
+        "glowIntensity",
+        "rotationSpeed",
+        "bassBoost",
+        "notes",
+        "showLeftPanel",
+        "showRightPanel",
+        "showTimeline",
+        "showMeters",
+        "autoHideControls",
+        "darkTheme",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/presets/{presetId}": {
+      "schema": {
+        "$ref": "#/entities/Preset"
+      },
+      "description": "User-saved visualizer presets synced across devices"
+    },
+    "/drafts/{draftId}": {
+      "schema": {
+        "$ref": "#/entities/ProjectDraft"
+      },
+      "description": "User project drafts and custom UI workspace configurations"
+    }
+  }
+}
